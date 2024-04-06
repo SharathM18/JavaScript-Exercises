@@ -28,7 +28,7 @@ const calculateVolume = (length) => {
 
 console.log(calculateVolume(1)(2)(3));
 
-/*example question1: 
+/*example question1:
 evaluate("addition")(4)(2)
 evaluate("subtraction")(4)(2);
 evaluate("multiply")(4)(2);
