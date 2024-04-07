@@ -141,6 +141,13 @@ fetchData()
 
 ```
 
+### Promise Methods
+
+- Promise.all()
+- Promise.allSettled()
+- Promise.race()
+- Promise.any()
+
 ### Promise.all()
 
 - Waits for all promises in an array to settle (resolve or reject) before returning a single promise.
