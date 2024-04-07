@@ -67,6 +67,8 @@ myPromise.catch(function(error) {
 
 ### Promise Chain
 
+- Where each step in the chain depends on the successful promise of the previous one.
+
 ```
 // Promise Example - 1
 
@@ -137,4 +139,196 @@ fetchData()
     console.error("Unhandled error:", error); // Catches any errors not handled above
   });
 
+```
+
+### Promise.all()
+
+- Waits for all promises in an array to settle (resolve or reject) before returning a single promise.
+- if all promise is resolved. it return a resolved value from the promise.
+- if any one of the promise is rejected. the whole promise will throw an error and it will not wait for others promise to complete.
+
+```
+const promise1 = new Promise((resolve, reject) => {
+  setTimeout(() => resolve("Promise 1 resolved"), 1000);
+});
+
+const promise2 = new Promise((resolve, reject) => {
+  setTimeout(() => resolve("Promise 2 resolved"), 2000);
+});
+
+Promise.all([promise1, promise2]) // it invoked the both the promise and it will execute both promises concurrently and wait for both to resolve.
+  .then((values) => {
+    console.log(values); // ["Promise 1 resolved", "Promise 2 resolved"]
+  })
+  .catch((error) => {
+    console.error(error); // If any promise rejects, this catches it
+  });
+```
+
+### Promise.allSettled()
+
+- It perform the all operation of the promise
+- It returns the array of objects to describing the outcome of each promise.
+- Regardless of whether they promises resolve or reject.
+
+```
+const promise1 = new Promise((resolve, reject) => {
+  setTimeout(() => resolve("Promise 1 resolved"), 1000);
+});
+
+const promise2 = new Promise((resolve, reject) => {
+  setTimeout(() => reject(new Error("Promise 2 rejected")), 1500);
+});
+
+Promise.allSettled([promise1, promise2]).then((results) => {
+  results.forEach((result) => {
+    if (result.status === "fulfilled") {
+      console.log(result.status, result.value);
+    } else {
+      console.error(result.status, result.reason);
+      console.log(result.status, result.reason);
+    }
+  });
+  console.log(results); // it returns array of object
+});
+```
+
+### Promise.race()
+
+- If 1st promise resolved, it return promise resolved value.
+- If 1st promise is rejected, it will throw an error.
+- Whichever promises settled first that will get only considered and subsequent settlements of other promises are ignored.
+
+```
+const promise1 = new Promise((resolve, reject) => {
+  setTimeout(() => resolve("Promise 1 resolved"), 2000);
+});
+
+const promise2 = new Promise((resolve, reject) => {
+  setTimeout(() => resolve("Promise 2 resolved"), 1000);
+});
+
+Promise.race([promise1, promise2])
+  .then((value) => {
+    console.log(value); // "Promise 2 resolved" (whichever resolves first)
+  })
+  .catch((error) => {
+    console.error(error); // If the first promise rejects, this catches it
+  });
+```
+
+### Promise.any()
+
+- It will waits for any one of the promises to resolved in order to get the resolved value.
+- if all the promise is rejected. it returns a `AggregateError`
+- `Promise.race()` gets the result based on the 1st settlements either if its resolved or rejected
+- `Promise.any()` gets the result based on the 1st resolved or fulfilled.
+- Ex: if 1st promise is rejected and 2nd promise is resolved then it considered as 2nd promise as result.
+
+```
+const promise1 = new Promise((resolve, reject) => {
+  setTimeout(() => reject("Promise 1 rejected"), 1000);
+});
+
+const promise2 = new Promise((resolve, reject) => {
+  setTimeout(() => resolve("Promise 2 resolved"), 2000);
+});
+
+const promise3 = new Promise((resolve, reject) => {
+  setTimeout(() => resolve("Promise 3 resolved"), 1500);
+});
+
+Promise.any([promise1, promise2, promise3])
+  .then(value => {
+    console.log(value); // Logs the value of the first resolved promise
+  })
+  .catch(error => {
+    console.error(error); // Logs AggregateError if all promises are rejected
+  });
+```
+
+Example for `AggregateError`
+
+```
+const promise1 = new Promise((resolve, reject) => {
+  setTimeout(() => reject("Promise 1 rejected"), 1000);
+});
+
+const promise2 = new Promise((resolve, reject) => {
+  setTimeout(() => reject("Promise 2 resolved"), 2000);
+});
+
+const promise3 = new Promise((resolve, reject) => {
+  setTimeout(() => reject("Promise 3 resolved"), 1500);
+});
+
+Promise.any([promise1, promise2, promise3])
+  .then((value) => {
+    console.log(value); // Logs the value of the first resolved promise
+  })
+  .catch((error) => {
+    console.error(error); // Logs AggregateError if all promises are rejected
+  });
+```
+
+#### Note
+
+- Settled means 2 state [success, failure] or [fulfilled, rejected] or [resolve, reject]
+
+### async and await
+
+- async and await make promises easier to write
+- `async` makes a function return a Promise
+- `await` makes a function wait for a Promise
+
+`Example of async and await:`
+
+```
+// Async function declaration
+async function fetchData() {
+  // Simulating an asynchronous operation (e.g., fetching data from an API)
+  return new Promise(resolve => {
+    setTimeout(() => resolve("Data fetched"), 1000);
+  });
+}
+
+// Async function call with await
+async function getData() {
+  try {
+    // Await pauses the execution until the promise returned by fetchData resolves
+    const data = await fetchData();
+    console.log(data); // Logs: Data fetched
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Calling the async function
+getData();
+
+```
+
+`compare with the promise:`
+
+```
+// Function returning a promise
+function fetchData() {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => resolve("Data fetched"), 1000);
+  });
+}
+
+// Promise chain
+function getData() {
+  fetchData()
+    .then((data) => {
+      console.log(data); // Logs: Data fetched
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
+
+// Calling the function
+getData();
 ```
