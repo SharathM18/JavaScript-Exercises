@@ -76,3 +76,9 @@ function sum(num) {
 }
 
 console.log(sum(1)(2)(4)());
+
+// sum(1) returns a function.
+// (2) is passed to the returned function, resulting in sum(3) = sum(1 + 2)
+// (4) is passed to the returned function, resulting in sum(7) = sum(3 + 4)
+// () is called on the returned function, resulting in 7
+// So, the output is 7
